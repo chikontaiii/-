@@ -1,35 +1,21 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <title>АЛИМБЕКОВ ЗАИРБЕК ТИЛЕБЕРДИЕВИЧ</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-      background: #ccc;
-    }
-    #pdf-viewer {
-      width: 100%;
-      height: 100vh;
-      overflow: auto;
-    }
-    canvas {
-      display: block;
-      margin: 10px auto;
-      box-shadow: 0 0 5px rgba(0,0,0,0.3);
-    }
-  </style>
+<meta charset="UTF-8">
+<title>АЛИМБЕКОВ ЗАИРБЕК ТИЛЕБЕРДИЕВИЧ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    body { margin: 0; background: #ccc; display: flex; flex-direction: column; align-items: center; }
+    canvas { margin: 10px 0; max-width: 95%; height: auto; box-shadow: 0 0 5px rgba(0,0,0,0.3); }
+</style>
 </head>
 <body>
 
 <div id="pdf-viewer"></div>
 
-<!-- Подключаем PDF.js через CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.16.105/pdf.min.js"></script>
 <script>
-const url = 'АЛИМБЕКОВ ЗАИРБЕК ТИЛЕБЕРДИЕВИЧ.pdf'; // твой PDF
+const url = 'АЛИМБЕКОВ ЗАИРБЕК ТИЛЕБЕРДИЕВИЧ.pdf';
 
 const pdfjsLib = window['pdfjs-dist/build/pdf'];
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.16.105/pdf.worker.min.js';
@@ -39,14 +25,19 @@ const container = document.getElementById('pdf-viewer');
 pdfjsLib.getDocument(url).promise.then(pdf => {
     for(let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
         pdf.getPage(pageNum).then(page => {
-            const viewport = page.getViewport({scale: 1.5}); // масштаб
+            const viewport = page.getViewport({scale: 1}); // базовый масштаб
             const canvas = document.createElement('canvas');
             const context = canvas.getContext('2d');
-            canvas.height = viewport.height;
-            canvas.width = viewport.width;
+            
+            // Рассчитываем масштаб, чтобы подогнать под ширину экрана
+            const scale = Math.min((window.innerWidth * 0.95) / viewport.width, 1.5);
+            const scaledViewport = page.getViewport({scale: scale});
+            
+            canvas.width = scaledViewport.width;
+            canvas.height = scaledViewport.height;
             container.appendChild(canvas);
 
-            page.render({canvasContext: context, viewport: viewport});
+            page.render({canvasContext: context, viewport: scaledViewport});
         });
     }
 }).catch(err => {
