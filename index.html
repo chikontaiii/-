@@ -2,11 +2,23 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>АЛИМБЕКОВ ЗАИРБЕК ТИЛЕБЕРДИЕВИЧ</title>
+<title>PDF Viewer</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-    body { margin: 0; background: #ccc; display: flex; flex-direction: column; align-items: center; }
-    canvas { margin: 10px 0; max-width: 95%; height: auto; box-shadow: 0 0 5px rgba(0,0,0,0.3); }
+    body {
+        margin: 0;
+        background: #ccc;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-family: sans-serif;
+    }
+    canvas {
+        margin: 10px 0;
+        max-width: 95%;
+        height: auto;
+        box-shadow: 0 0 5px rgba(0,0,0,0.3);
+    }
 </style>
 </head>
 <body>
@@ -15,33 +27,47 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.16.105/pdf.min.js"></script>
 <script>
-const url = 'АЛИМБЕКОВ ЗАИРБЕК ТИЛЕБЕРДИЕВИЧ.pdf';
+const url = 'АЛИМБЕКОВ ЗАИРБЕК ТИЛЕБЕРДИЕВИЧ.pdf';  // Путь к PDF в репозитории
 
 const pdfjsLib = window['pdfjs-dist/build/pdf'];
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.16.105/pdf.worker.min.js';
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.16.105/pdf.worker.min.js';
 
 const container = document.getElementById('pdf-viewer');
 
 pdfjsLib.getDocument(url).promise.then(pdf => {
-    for(let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+
+    function renderPage(pageNum) {
         pdf.getPage(pageNum).then(page => {
-            const viewport = page.getViewport({scale: 1}); // базовый масштаб
+
+            const viewport = page.getViewport({scale: 1});
             const canvas = document.createElement('canvas');
             const context = canvas.getContext('2d');
-            
-            // Рассчитываем масштаб, чтобы подогнать под ширину экрана
-            const scale = Math.min((window.innerWidth * 0.95) / viewport.width, 1.5);
+
+            // Автоматический масштаб под любую ширину экрана
+            const scale = Math.min((window.innerWidth * 0.95) / viewport.width, 2);
             const scaledViewport = page.getViewport({scale: scale});
-            
+
             canvas.width = scaledViewport.width;
             canvas.height = scaledViewport.height;
             container.appendChild(canvas);
 
-            page.render({canvasContext: context, viewport: scaledViewport});
+            page.render({
+                canvasContext: context,
+                viewport: scaledViewport
+            });
+
+            if (pageNum < pdf.numPages) {
+                renderPage(pageNum + 1);
+            }
         });
     }
+
+    renderPage(1);
+
 }).catch(err => {
-    container.innerHTML = "<p style='color:red; text-align:center;'>Ошибка загрузки PDF: "+err+"</p>";
+    container.innerHTML =
+        "<p style='color:red; text-align:center;'>Ошибка загрузки PDF: " + err + "</p>";
 });
 </script>
 
