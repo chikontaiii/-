@@ -2,65 +2,26 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>АЛИМБЕКОВ ЗАИРБЕК ТИЛЕБЕРДИЕВИЧ</title>
+<title>Просмотр PDF</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-    body {
+    html, body {
         margin: 0;
-        background: #ccc;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        font-family: sans-serif;
+        padding: 0;
+        height: 100%;
+        overflow: hidden;
+        background: #fff;
     }
-    canvas {
-        margin: 10px 0;
-        max-width: 95%;
-        height: auto;
+    iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
     }
 </style>
 </head>
 <body>
 
-<div id="pdf-viewer"></div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-<script>
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-  "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js";
-
-const container = document.getElementById("pdf-viewer");
-const url = "АЛИМБЕКОВ ЗАИРБЕК ТИЛЕБЕРДИЕВИЧ.pdf";
-
-pdfjsLib.getDocument(url).promise.then(pdf => {
-
-  function showPage(n) {
-    pdf.getPage(n).then(page => {
-      const viewport = page.getViewport({ scale: 1 });
-      const scale = Math.min((window.innerWidth * 0.95) / viewport.width, 2);
-      const sv = page.getViewport({ scale });
-
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
-
-      canvas.width = sv.width;
-      canvas.height = sv.height;
-
-      container.appendChild(canvas);
-
-      page.render({ canvasContext: ctx, viewport: sv });
-
-      if (n < pdf.numPages) showPage(n + 1);
-    });
-  }
-
-  showPage(1);
-
-}).catch(e => {
-  container.innerHTML = "<p style='color:red'>Ошибка: " + e + "</p>";
-});
-</script>
+<iframe src="АЛИМБЕКОВ%20ЗАИРБЕК%20ТИЛЕБЕРДИЕВИЧ.pdf"></iframe>
 
 </body>
 </html>
-
