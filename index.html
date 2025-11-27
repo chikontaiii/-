@@ -17,7 +17,6 @@
         margin: 10px 0;
         max-width: 95%;
         height: auto;
-        box-shadow: 0 0 5px rgba(0,0,0,0.3);
     }
 </style>
 </head>
@@ -25,49 +24,40 @@
 
 <div id="pdf-viewer"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.16.105/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
 <script>
-const url = 'АЛИМБЕКОВ ЗАИРБЕК ТИЛЕБЕРДИЕВИЧ.pdf';  // Путь к PDF в репозитории
-
-const pdfjsLib = window['pdfjs-dist/build/pdf'];
 pdfjsLib.GlobalWorkerOptions.workerSrc =
-    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.16.105/pdf.worker.min.js';
+  "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js";
 
-const container = document.getElementById('pdf-viewer');
+const container = document.getElementById("pdf-viewer");
+const url = "АЛИМБЕКОВ ЗАИРБЕК ТИЛЕБЕРДИЕВИЧ.pdf";
 
 pdfjsLib.getDocument(url).promise.then(pdf => {
 
-    function renderPage(pageNum) {
-        pdf.getPage(pageNum).then(page => {
+  function showPage(n) {
+    pdf.getPage(n).then(page => {
+      const viewport = page.getViewport({ scale: 1 });
+      const scale = Math.min((window.innerWidth * 0.95) / viewport.width, 2);
+      const sv = page.getViewport({ scale });
 
-            const viewport = page.getViewport({scale: 1});
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
 
-            // Автоматический масштаб под любую ширину экрана
-            const scale = Math.min((window.innerWidth * 0.95) / viewport.width, 2);
-            const scaledViewport = page.getViewport({scale: scale});
+      canvas.width = sv.width;
+      canvas.height = sv.height;
 
-            canvas.width = scaledViewport.width;
-            canvas.height = scaledViewport.height;
-            container.appendChild(canvas);
+      container.appendChild(canvas);
 
-            page.render({
-                canvasContext: context,
-                viewport: scaledViewport
-            });
+      page.render({ canvasContext: ctx, viewport: sv });
 
-            if (pageNum < pdf.numPages) {
-                renderPage(pageNum + 1);
-            }
-        });
-    }
+      if (n < pdf.numPages) showPage(n + 1);
+    });
+  }
 
-    renderPage(1);
+  showPage(1);
 
-}).catch(err => {
-    container.innerHTML =
-        "<p style='color:red; text-align:center;'>Ошибка загрузки PDF: " + err + "</p>";
+}).catch(e => {
+  container.innerHTML = "<p style='color:red'>Ошибка: " + e + "</p>";
 });
 </script>
 
